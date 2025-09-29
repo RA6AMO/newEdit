@@ -5,6 +5,7 @@
 #include <QSqlRecord>
 #include <QSqlField>
 #include <QDebug>
+#include <QMetaType>
 
 DBTableSchemaManager::DBTableSchemaManager()
     : m_connectionName(DEFAULT_CONNECTION_NAME)
@@ -222,7 +223,13 @@ QList<ColumnDefinition> DBTableSchemaManager::getTableStructure(const QString& t
     for (int i = 0; i < record.count(); ++i) {
         QSqlField field = record.field(i);
 
-        ColumnDefinition column(field.name(), field.typeName());
+        QString typeName;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        typeName = QString::fromLatin1(field.metaType().name());
+#else
+        typeName = QString::fromLatin1(QMetaType::typeName(static_cast<int>(field.type())));
+#endif
+        ColumnDefinition column(field.name(), typeName);
         column.isNotNull = !field.isNull();
         column.isAutoIncrement = field.isAutoValue();
         column.defaultValue = field.defaultValue().toString();
@@ -373,4 +380,15 @@ bool DBTableSchemaManager::validateColumnName(const QString& columnName) const
     }
 
     return true;
+}
+
+bool DBTableSchemaManager::setConnectionName(const QString& connectionName)
+{
+    m_connectionName = connectionName;
+    return true;
+}
+
+QString DBTableSchemaManager::getConnectionName() const
+{
+    return m_connectionName;
 }

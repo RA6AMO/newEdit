@@ -1,5 +1,6 @@
 #pragma once
 #include "DBConnection.h"
+#include "DBTableSchemaManager.h"
 
 class DatabaseManager {
     public:
@@ -13,7 +14,7 @@ class DatabaseManager {
 
         // Получение менеджеров
         DBConnection* getConnection() const;
-        //TableSchemaManager* getSchemaManager() const;
+        DBTableSchemaManager* getSchemaManager() const;
         //DataReader* getReader() const;
         //DataModifier* getModifier() const;
 
@@ -23,7 +24,7 @@ class DatabaseManager {
 
     private:
         DBConnection* m_connection;
-        //TableSchemaManager* m_schemaManager;
+        DBTableSchemaManager* m_schemaManager;
         //DataReader* m_reader;
         //DataModifier* m_modifier;
         QString m_lastError;
