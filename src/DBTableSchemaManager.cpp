@@ -5,6 +5,7 @@
 #include <QSqlRecord>
 #include <QSqlField>
 #include <QDebug>
+#include <QMetaType>
 
 DBTableSchemaManager::DBTableSchemaManager()
     : m_connectionName(DEFAULT_CONNECTION_NAME)
@@ -222,10 +223,13 @@ QList<ColumnDefinition> DBTableSchemaManager::getTableStructure(const QString& t
     for (int i = 0; i < record.count(); ++i) {
         QSqlField field = record.field(i);
 
-        ColumnDefinition column(field.name(), field.typeName());
-        column.isNotNull = !field.isNull();
-        column.isAutoIncrement = field.isAutoValue();
-        column.defaultValue = field.defaultValue().toString();
+        QString typeName;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        typeName = QString::fromLatin1(field.metaType().name());
+#else
+        typeName = QLatin1String(QMetaType::typeName(static_cast<int>(field.type())));
+#endif
+        ColumnDefinition column(field.name(), typeName);
 
         // Для определения первичного ключа нужно выполнить дополнительный запрос
         // В SQLite это можно сделать через PRAGMA table_info
