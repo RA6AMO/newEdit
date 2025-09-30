@@ -1,5 +1,8 @@
 #pragma once
 #include "DBConnection.h"
+#include "DBTableSchemaManager.h"
+#include "DataReader.h"
+#include "DataModifier.h"
 
 class DatabaseManager {
     public:
@@ -13,18 +16,18 @@ class DatabaseManager {
 
         // Получение менеджеров
         DBConnection* getConnection() const;
-        //TableSchemaManager* getSchemaManager() const;
-        //DataReader* getReader() const;
-        //DataModifier* getModifier() const;
+        DBTableSchemaManager* getSchemaManager() const;
+        DataReader* getReader() const;
+        DataModifier* getModifier() const;
 
         // Проверка состояния
         bool isReady() const;
         QString getLastError() const;
 
     private:
-        DBConnection* m_connection;
-        //TableSchemaManager* m_schemaManager;
-        //DataReader* m_reader;
-        //DataModifier* m_modifier;
+        std::unique_ptr<DBConnection> m_connection;
+        std::unique_ptr<DBTableSchemaManager> m_schemaManager;
+        std::unique_ptr<DataReader> m_reader;
+        std::unique_ptr<DataModifier> m_modifier;
         QString m_lastError;
 };

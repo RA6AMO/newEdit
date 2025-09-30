@@ -227,9 +227,12 @@ QList<ColumnDefinition> DBTableSchemaManager::getTableStructure(const QString& t
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
         typeName = QString::fromLatin1(field.metaType().name());
 #else
-        typeName = QLatin1String(QMetaType::typeName(static_cast<int>(field.type())));
+        typeName = QString::fromLatin1(QMetaType::typeName(static_cast<int>(field.type())));
 #endif
         ColumnDefinition column(field.name(), typeName);
+        column.isNotNull = !field.isNull();
+        column.isAutoIncrement = field.isAutoValue();
+        column.defaultValue = field.defaultValue().toString();
 
         // Для определения первичного ключа нужно выполнить дополнительный запрос
         // В SQLite это можно сделать через PRAGMA table_info
@@ -377,4 +380,15 @@ bool DBTableSchemaManager::validateColumnName(const QString& columnName) const
     }
 
     return true;
+}
+
+bool DBTableSchemaManager::setConnectionName(const QString& connectionName)
+{
+    m_connectionName = connectionName;
+    return true;
+}
+
+QString DBTableSchemaManager::getConnectionName() const
+{
+    return m_connectionName;
 }

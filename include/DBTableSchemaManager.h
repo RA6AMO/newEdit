@@ -83,6 +83,10 @@ public:
     // Очистить текст последней ошибки
     void clearError();
 
+    bool setConnectionName(const QString& connectionName);
+
+    QString getConnectionName() const;
+
 private:
     // Последнее сообщение об ошибке операций со схемой
     QString m_lastError;
