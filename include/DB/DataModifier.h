@@ -33,7 +33,6 @@ public:
      */
     explicit DataModifier(const QString& connectionName = QString());
 
-    explicit DataModifier();
 
     /**
      * @brief Деструктор - откатывает незавершенные транзакции

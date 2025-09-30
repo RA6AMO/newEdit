@@ -12,9 +12,6 @@ DataModifier::DataModifier(const QString& connectionName)
     , m_inTransaction(false)
 {}
 
-DataModifier::DataModifier() : m_connectionName(""), m_lastInsertId(-1), m_affectedRows(0),m_inTransaction(false)
-{}
-
 DataModifier::~DataModifier()
 {
     // Откатываем незавершенную транзакцию при уничтожении объекта

@@ -11,7 +11,7 @@ int main( int argc, char *argv[]) {
     DatabaseManager dbInit;
 
 
-    LogWindow logWindow(dbInit);
+    LogWindow logWindow(&dbInit);
 
     logWindow.setWindowTitle("Logging Window");
     logWindow.show();

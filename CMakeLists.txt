@@ -33,7 +33,7 @@ file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS
 file(GLOB_RECURSE PROJECT_HEADERS CONFIGURE_DEPENDS
   "${CMAKE_SOURCE_DIR}/include/*.h"
   "${CMAKE_SOURCE_DIR}/include/TreeWidgetsHed/*.h"
-  "${CMAKE_SOURCE_DIR}/include/DBhead/*.h"
+  "${CMAKE_SOURCE_DIR}/include/DB/*.h"
 )
 
 add_executable(app ${PROJECT_SOURCES} ${PROJECT_HEADERS})
@@ -42,7 +42,7 @@ add_executable(app ${PROJECT_SOURCES} ${PROJECT_HEADERS})
 target_include_directories(app PRIVATE
     "${CMAKE_SOURCE_DIR}/include"
     "${CMAKE_SOURCE_DIR}/include/TreeWidgetsHed"
-    "${CMAKE_SOURCE_DIR}/include/DBhead"
+    "${CMAKE_SOURCE_DIR}/include/DB"
     ${THIRD_PARTY_INCLUDE_DIR}
 )
 

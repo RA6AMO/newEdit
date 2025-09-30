@@ -32,6 +32,10 @@ Diagnostics:
       - readability-uppercase-literal-suffix
       - readability-braces-around-statements
       - modernize-use-trailing-return-type
+      - readability-identifier-length
+      - readability-convert-member-functions-to-static
+      - readability-static-definition-in-anonymous-namespace
+      - readability-redundant-access-specifiers
   UnusedIncludes: Strict
   MissingIncludes: None #None - полностью отключить предупреждения Relaxed - показывать только важные случаи
   #Strict - показывать все случаи (текущее значение)

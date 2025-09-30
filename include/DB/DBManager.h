@@ -11,8 +11,8 @@ class DatabaseManager {
         ~DatabaseManager();
 
         // Инициализация
-        bool initialize(const QString& connectionName, const QString& dbPath);
-        void cleanup();
+        //bool initialize(const QString& connectionName, const QString& dbPath);
+        //void cleanup();
 
         // Получение менеджеров
         DBConnection* getConnection() const;
@@ -21,8 +21,8 @@ class DatabaseManager {
         DataModifier* getModifier() const;
 
         // Проверка состояния
-        bool isReady() const;
-        QString getLastError() const;
+       // bool isReady() const;
+       // QString getLastError() const;
 
     private:
         std::unique_ptr<DBConnection> m_connection;
