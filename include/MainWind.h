@@ -14,4 +14,8 @@ public:
 private:
     DatabaseManager *dbMan;
     std::unique_ptr<LTreeWidget> Ltree;
+
+
+
+    bool tableCreater();
 };

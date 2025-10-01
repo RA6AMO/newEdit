@@ -39,17 +39,17 @@
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="pushButton_createTree">
     <property name="geometry">
      <rect>
-      <x>230</x>
-      <y>70</y>
-      <width>75</width>
+      <x>10</x>
+      <y>80</y>
+      <width>111</width>
       <height>24</height>
      </rect>
     </property>
     <property name="text">
-     <string>Кнопка</string>
+     <string>Создать дерево</string>
     </property>
    </widget>
   </widget>

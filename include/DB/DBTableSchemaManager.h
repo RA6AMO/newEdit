@@ -20,7 +20,7 @@ struct ColumnDefinition {
     // Автоинкремент (зависит от СУБД; в SQLite работает для INTEGER PRIMARY KEY)
     bool isAutoIncrement = false;
     // Ограничение NOT NULL
-    bool isNotNull = false;
+    bool isNotNull = true;
     // Ограничение UNIQUE для одиночной колонки
     bool isUnique = false;
     // Значение по умолчанию. Будет подставлено как DEFAULT '...'
