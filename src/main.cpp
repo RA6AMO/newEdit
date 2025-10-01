@@ -6,7 +6,13 @@
 
 
 int main( int argc, char *argv[]) {
-
+/*
+    int a = 3;
+    int b = 99;
+    a += b;
+    b = a - b;
+    a = a-b;
+*/
     QApplication app(argc, argv);
 
     DatabaseManager dbInit("default_connection","my_database.db");
