@@ -13,6 +13,9 @@ public:
     LogWindow(DatabaseManager *dbInit, QWidget *parent = nullptr);
     ~LogWindow();
 
+signals:
+    void loginSuccess();
+
 private slots:
     void on_login_btn_clicked();
     void on_Clear_fields_btn_clicked();

@@ -1,4 +1,5 @@
 #include "logWindow.h"
+#include <QSqlRecord>
 
 LogWindow::LogWindow(DatabaseManager *dbInit, QWidget *parent)
     : QDialog(parent), dbMan(dbInit)
@@ -31,7 +32,27 @@ void LogWindow::on_login_btn_clicked()
     label->setStyleSheet("");
     label->setText("Введите логин и пароль");
 
-    // Здесь можно продолжить логику входа
+    QList<QSqlRecord> users = dbMan->getReader()->findByColumn("users", "login", login);
+    if (users.isEmpty())
+    {
+        showErrorMessage("Пользователь не найден");
+        return;
+    }
+    else{
+        QList<QSqlRecord> users_password = dbMan->getReader()->findByColumn("users", "password", password);
+        if (users_password.isEmpty())
+        {
+            showErrorMessage("Неверный пароль");
+            return;
+        }
+        else{
+            showErrorMessage("Вход выполнен успешно");
+            emit loginSuccess();
+            this->hide();
+            return;
+        }
+    }
+
 }
 
 void LogWindow::on_Clear_fields_btn_clicked()

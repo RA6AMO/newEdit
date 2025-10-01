@@ -39,4 +39,7 @@ DataReader* DatabaseManager::getReader() const
     return m_reader.get();
 }
 
-//Data
+DataModifier* DatabaseManager::getModifier() const
+{
+    return m_modifier.get();
+}
