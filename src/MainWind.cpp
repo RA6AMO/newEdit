@@ -5,7 +5,7 @@ MainWindow::MainWindow(DatabaseManager *dbInit, QMainWindow *parent)
     : QMainWindow(parent), dbMan(dbInit)
 {
     setupUi(this);
-    Ltree = std::make_unique<LTreeWidget>("tree_nodes",treeWidget,dbMan);
+    Ltree = std::make_unique<LTreeWidget>("tree_nodes",treeWidget, dbMan);
 
     connect(pushButton_createTree, &QPushButton::clicked, this, &MainWindow::tableCreater);
 }
@@ -14,6 +14,8 @@ MainWindow::~MainWindow()
 {
 
 }
+
+
 
 bool MainWindow::tableCreater()
 {
