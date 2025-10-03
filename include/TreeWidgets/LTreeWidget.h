@@ -17,19 +17,34 @@ class LTreeWidget : public QTreeWidget
 {
     Q_OBJECT
 public:
-    LTreeWidget(QString tableName,QTreeWidget *parent = nullptr, DatabaseManager *dbMan = nullptr);
+    explicit LTreeWidget(QWidget *parent = nullptr);
+    LTreeWidget(QString tableName, QWidget *parent = nullptr, DatabaseManager *dbMan = nullptr);
     ~LTreeWidget();
 
-    void addNodeToRoot(const QString &node);
-    void addNodeToParent(const QString &node, const QString &parentId);
+    void configure(const QString &tableName, DatabaseManager *dbMan);
+
+    void addNodeToRoot();
+    void addNodeToParent(const QString &parentId);
+    void deleteNode(const QString &nodeId);
+    void renameNode(const QString &nodeId);
+
+
+
+
+//signals:
+
 
 private:
     void iniTree(QString tableName);
-    QTreeWidget *parent;
+    QString m_tableName;
     DatabaseManager *dbMan;
 
     //std::vector<TreeStruct> treeNodes;
     QMap<QString, std::shared_ptr<QTreeWidgetItem>> itemMap;
+
+    // Helper methods
+    bool isRoot(const QString &nodeId);
+    void attachToParent(const QString &childId, const QString &parentId);
 
 
 };
