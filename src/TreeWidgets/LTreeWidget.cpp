@@ -40,10 +40,12 @@ void LTreeWidget::setupContextMenu()
     addChildAction = contextMenu->addAction("Добавить дочерний элемент");
     deleteAction = contextMenu->addAction("Удалить");
     renameAction = contextMenu->addAction("Переименовать");
+    addRootAction = contextMenu->addAction("Добавить корневой элемент");
 
     connect(addChildAction, &QAction::triggered, this, &LTreeWidget::onAddChild);
     connect(deleteAction, &QAction::triggered, this, &LTreeWidget::onDeleteNode);
     connect(renameAction, &QAction::triggered, this, &LTreeWidget::onRenameNode);
+    connect(addRootAction, &QAction::triggered, this, &LTreeWidget::addNodeToRoot);
 }
 
 void LTreeWidget::iniTree(QString tableName)
@@ -143,16 +145,17 @@ void LTreeWidget::showContextMenu(const QPoint &pos)
         addChildAction->setVisible(true);
         deleteAction->setVisible(true);
         renameAction->setVisible(true);
+        addRootAction->setVisible(false);
     } else {
         // Клик по пустому месту - показываем только добавление корневого элемента
         currentSelectedNodeId.clear();
         addChildAction->setVisible(false);
         deleteAction->setVisible(false);
         renameAction->setVisible(false);
-
+        addRootAction->setVisible(true);
         // Добавляем действие для корневого элемента
-        QAction *addRootAction = contextMenu->addAction("Добавить корневой элемент");
-        connect(addRootAction, &QAction::triggered, this, &LTreeWidget::addNodeToRoot);
+        //QAction *addRootAction = contextMenu->addAction("Добавить корневой элемент");
+        //connect(addRootAction, &QAction::triggered, this, &LTreeWidget::addNodeToRoot);
     }
 
     contextMenu->exec(mapToGlobal(pos));

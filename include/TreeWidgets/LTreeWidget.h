@@ -52,6 +52,7 @@ private:
     QAction *addChildAction;
     QAction *deleteAction;
     QAction *renameAction;
+    QAction *addRootAction;
     QString currentSelectedNodeId;
 
     // Helper methods
