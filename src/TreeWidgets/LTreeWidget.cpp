@@ -8,15 +8,42 @@ struct TreeStruct
     QString parent_id;
     QString id;
 };
+LTreeWidget::LTreeWidget(QWidget *parent) : QTreeWidget(parent), dbMan(nullptr)
+{
+    setupContextMenu();
+    // Не инициализируем дерево, так как нет имени таблицы и менеджера БД
+}
 
-LTreeWidget::LTreeWidget(QString tableName,QTreeWidget *parent, DatabaseManager *dbMan) : QTreeWidget(parent), dbMan(dbMan)
+LTreeWidget::LTreeWidget(QString tableName,QWidget *parent, DatabaseManager *dbMan) : QTreeWidget(parent), dbMan(dbMan)
 {
     m_tableName = tableName;
+    setupContextMenu();
     iniTree(tableName);
+
+    // Подключаем сигналы
+    connect(this, &QTreeWidget::itemClicked, this, &LTreeWidget::onItemClicked);
+    connect(this, &QTreeWidget::itemDoubleClicked, this, &LTreeWidget::onItemDoubleClicked);
+    connect(this, &QTreeWidget::customContextMenuRequested, this, &LTreeWidget::showContextMenu);
+
+    // Включаем контекстное меню
+    setContextMenuPolicy(Qt::CustomContextMenu);
 }
 
 LTreeWidget::~LTreeWidget()
 {
+}
+
+void LTreeWidget::setupContextMenu()
+{
+    contextMenu = new QMenu(this);
+
+    addChildAction = contextMenu->addAction("Добавить дочерний элемент");
+    deleteAction = contextMenu->addAction("Удалить");
+    renameAction = contextMenu->addAction("Переименовать");
+
+    connect(addChildAction, &QAction::triggered, this, &LTreeWidget::onAddChild);
+    connect(deleteAction, &QAction::triggered, this, &LTreeWidget::onDeleteNode);
+    connect(renameAction, &QAction::triggered, this, &LTreeWidget::onRenameNode);
 }
 
 void LTreeWidget::iniTree(QString tableName)
@@ -59,9 +86,97 @@ void LTreeWidget::iniTree(QString tableName)
 
         // Включаем стрелочки для разворачивания/сворачивания
         setRootIsDecorated(true);
+}
 
-        // Разворачиваем все элементы для демонстрации
-        //expandAll();
+void LTreeWidget::onItemClicked(QTreeWidgetItem *item, int column)
+{
+    if (!item) return;
+
+    // Находим ID узла по элементу
+    QString nodeId;
+    for (auto it = itemMap.begin(); it != itemMap.end(); ++it) {
+        if (it.value().get() == item) {
+            nodeId = it.key();
+            break;
+        }
+    }
+
+    if (!nodeId.isEmpty()) {
+        currentSelectedNodeId = nodeId;
+        emit itemClicked(nodeId, item->text(0));
+    }
+}
+
+void LTreeWidget::onItemDoubleClicked(QTreeWidgetItem *item, int column)
+{
+    if (!item) return;
+
+    // Находим ID узла по элементу
+    QString nodeId;
+    for (auto it = itemMap.begin(); it != itemMap.end(); ++it) {
+        if (it.value().get() == item) {
+            nodeId = it.key();
+            break;
+        }
+    }
+
+    if (!nodeId.isEmpty()) {
+        emit itemDoubleClicked(nodeId, item->text(0));
+    }
+}
+
+void LTreeWidget::showContextMenu(const QPoint &pos)
+{
+    QTreeWidgetItem *item = itemAt(pos);
+
+    if (item) {
+        // Клик по элементу - показываем меню для элемента
+        currentSelectedNodeId.clear();
+        for (auto it = itemMap.begin(); it != itemMap.end(); ++it) {
+            if (it.value().get() == item) {
+                currentSelectedNodeId = it.key();
+                break;
+            }
+        }
+
+        // Показываем все действия для элемента
+        addChildAction->setVisible(true);
+        deleteAction->setVisible(true);
+        renameAction->setVisible(true);
+    } else {
+        // Клик по пустому месту - показываем только добавление корневого элемента
+        currentSelectedNodeId.clear();
+        addChildAction->setVisible(false);
+        deleteAction->setVisible(false);
+        renameAction->setVisible(false);
+
+        // Добавляем действие для корневого элемента
+        QAction *addRootAction = contextMenu->addAction("Добавить корневой элемент");
+        connect(addRootAction, &QAction::triggered, this, &LTreeWidget::addNodeToRoot);
+    }
+
+    contextMenu->exec(mapToGlobal(pos));
+}
+
+void LTreeWidget::onAddChild()
+{
+    if (!currentSelectedNodeId.isEmpty()) {
+        addNodeToParent(currentSelectedNodeId);
+    }
+}
+
+void LTreeWidget::onDeleteNode()
+{
+    if (!currentSelectedNodeId.isEmpty()) {
+        deleteNode(currentSelectedNodeId);
+    }
+}
+
+void LTreeWidget::onRenameNode()
+{
+    if (!currentSelectedNodeId.isEmpty()) {
+        renameNode(currentSelectedNodeId);
+    }
 }
 
 void LTreeWidget::addNodeToRoot()
@@ -126,13 +241,20 @@ void LTreeWidget::deleteNode(const QString &nodeId)
     // В транзакции: перепривязываем детей к родителю удаляемого узла, затем удаляем узел
     bool ok = dbMan->getModifier()->executeInTransaction([&]{
         // Перепривязываем всех детей к родителю удаляемого узла
-        if (!dbMan->getModifier()->updateColumn(m_tableName, "parent_id", parentId,
-                                               QString("parent_id = %1").arg(nodeId))) {
+
+        int affected = dbMan->getModifier()->updateColumn(m_tableName, "parent_id", parentId,QString("parent_id = %1").arg(nodeId));
+        qDebug() << "affected" << affected;
+        if (affected < 0) {
             return false;
         }
 
         // Удаляем сам узел
-        return dbMan->getModifier()->deleteRecordById(m_tableName, nodeId, "id");
+        affected = dbMan->getModifier()->deleteRecordById(m_tableName, nodeId, "id");
+        if (affected < 0) {
+            qDebug() << "affected" << affected;
+            return false;
+        }
+        return true;
     });
 
     if (!ok) {

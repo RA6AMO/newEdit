@@ -11,10 +11,13 @@ public:
     MainWindow(DatabaseManager *dbInit, QMainWindow *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void onTreeItemClicked(const QString &nodeId, const QString &nodeName);
+    void onTreeItemDoubleClicked(const QString &nodeId, const QString &nodeName);
+
 private:
     DatabaseManager *dbMan;
-
-
+    std::unique_ptr<LTreeWidget> Ltree;
 
     bool tableCreater();
 };

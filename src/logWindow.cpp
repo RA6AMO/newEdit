@@ -20,7 +20,9 @@ void LogWindow::on_login_btn_clicked()
 {
     QString login = lineEdit_3->text();
     QString password = lineEdit_4->text();
-
+    //////////////////////////////////////////////////////////////
+    emit loginSuccess(); //временное решение
+    //////////////////////////////////////////////////////////////
     // Проверка валидности логина и пароля
     if (!isValidInput(login) || !isValidInput(password))
     {
