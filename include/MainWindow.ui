@@ -29,16 +29,6 @@
      </property>
     </column>
    </widget>
-   <widget class="QTableWidget" name="tableWidget">
-    <property name="geometry">
-     <rect>
-      <x>194</x>
-      <y>111</y>
-      <width>651</width>
-      <height>661</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QPushButton" name="pushButton_createTree">
     <property name="geometry">
      <rect>
@@ -50,6 +40,16 @@
     </property>
     <property name="text">
      <string>Создать дерево</string>
+    </property>
+   </widget>
+   <widget class="MainTable" name="tableView">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>110</y>
+      <width>711</width>
+      <height>661</height>
+     </rect>
     </property>
    </widget>
   </widget>
@@ -70,6 +70,11 @@
    <class>LTreeWidget</class>
    <extends>QTreeWidget</extends>
    <header>LTreeWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>MainTable</class>
+   <extends>QTableView</extends>
+   <header>MainTable.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

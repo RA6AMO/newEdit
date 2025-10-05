@@ -27,8 +27,8 @@ bool MainWindow::tableCreater()
 	columns << ColumnDefinition("name", "TEXT", false, false, true, false);
 	columns << ColumnDefinition("parent_id", "INTEGER", false, false, false, false);
 
-	DBTableSchemaManager schema;
-	if (!schema.createTable("tree_nodes", columns)) {
+	//DBTableSchemaManager schema;
+	if (!dbMan->getSchemaManager()->createTable("tree_nodes", columns)) {
 		return false;
 	}
 	return true;

@@ -20,6 +20,7 @@ LTreeWidget::LTreeWidget(QString tableName,QWidget *parent, DatabaseManager *dbM
     setupContextMenu();
     iniTree(tableName);
 
+    setHeaderHidden(true);
     // Подключаем сигналы
     connect(this, &QTreeWidget::itemClicked, this, &LTreeWidget::onItemClicked);
     connect(this, &QTreeWidget::itemDoubleClicked, this, &LTreeWidget::onItemDoubleClicked);
