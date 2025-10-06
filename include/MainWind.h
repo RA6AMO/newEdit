@@ -20,4 +20,5 @@ private:
     std::unique_ptr<LTreeWidget> Ltree;
 
     bool tableCreater();
+    bool tableFiller(const QString& tableName);
 };

@@ -307,12 +307,26 @@ bool DBTableSchemaManager::executeQuery(const QString& query)
 QString DBTableSchemaManager::buildCreateTableQuery(const QString& tableName, const QList<ColumnDefinition>& columns) const
 {
     QStringList columnDefinitions;
+    QStringList primaryKeys;
+
+    // Сначала собираем список PRIMARY KEY колонок
+    for (const auto& column : columns) {
+        if (column.isPrimaryKey) {
+            primaryKeys.append(column.name);
+        }
+    }
 
     for (const auto& column : columns) {
         QString columnDef = QString("%1 %2").arg(column.name, column.type);
 
-        if (column.isAutoIncrement) {
-            columnDef += " AUTOINCREMENT";
+        // Если это одиночный PRIMARY KEY - добавляем inline
+        if (column.isPrimaryKey && primaryKeys.size() == 1) {
+            columnDef += " PRIMARY KEY";
+
+            // AUTOINCREMENT можно использовать только с INTEGER PRIMARY KEY
+            if (column.isAutoIncrement) {
+                columnDef += " AUTOINCREMENT";
+            }
         }
 
         if (column.isNotNull) {
@@ -330,15 +344,8 @@ QString DBTableSchemaManager::buildCreateTableQuery(const QString& tableName, co
         columnDefinitions.append(columnDef);
     }
 
-    // Добавляем первичные ключи
-    QStringList primaryKeys;
-    for (const auto& column : columns) {
-        if (column.isPrimaryKey) {
-            primaryKeys.append(column.name);
-        }
-    }
-
-    if (!primaryKeys.isEmpty()) {
+    // Для составного PRIMARY KEY добавляем отдельно
+    if (primaryKeys.size() > 1) {
         columnDefinitions.append(QString("PRIMARY KEY (%1)").arg(primaryKeys.join(", ")));
     }
 
