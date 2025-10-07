@@ -27,6 +27,10 @@ file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS
   "${CMAKE_SOURCE_DIR}/src/*.cpp"
   "${CMAKE_SOURCE_DIR}/src/TreeWidgets/*.cpp"
   "${CMAKE_SOURCE_DIR}/src/DB/*.cpp"
+  "${CMAKE_SOURCE_DIR}/src/MainTable/*.cpp"
+  "${CMAKE_SOURCE_DIR}/src/Table/*.cpp"
+  "${CMAKE_SOURCE_DIR}/src/Table/Managers/*.cpp"
+  "${CMAKE_SOURCE_DIR}/src/Table/Delegates/*.cpp"
 )
 
 # Добавляем заголовочные файлы для правильной работы MOC с Q_OBJECT
@@ -34,6 +38,10 @@ file(GLOB_RECURSE PROJECT_HEADERS CONFIGURE_DEPENDS
   "${CMAKE_SOURCE_DIR}/include/*.h"
   "${CMAKE_SOURCE_DIR}/include/TreeWidgets/*.h"
   "${CMAKE_SOURCE_DIR}/include/DB/*.h"
+  "${CMAKE_SOURCE_DIR}/include/MainTable/*.h"
+  "${CMAKE_SOURCE_DIR}/include/Table/*.h"
+  "${CMAKE_SOURCE_DIR}/include/Table/Managers/*.h"
+  "${CMAKE_SOURCE_DIR}/include/Table/Delegates/*.h"
 )
 
 add_executable(app ${PROJECT_SOURCES} ${PROJECT_HEADERS})
@@ -43,6 +51,10 @@ target_include_directories(app PRIVATE
     "${CMAKE_SOURCE_DIR}/include"
     "${CMAKE_SOURCE_DIR}/include/TreeWidgets"
     "${CMAKE_SOURCE_DIR}/include/DB"
+    "${CMAKE_SOURCE_DIR}/include/MainTable"
+    "${CMAKE_SOURCE_DIR}/include/Table"
+    "${CMAKE_SOURCE_DIR}/include/Table/Managers"
+    "${CMAKE_SOURCE_DIR}/include/Table/Delegates"
     ${THIRD_PARTY_INCLUDE_DIR}
 )
 
