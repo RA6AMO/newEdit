@@ -3,6 +3,9 @@
 #include "DBManager.h"
 #include "LTreeWidget.h"
 #include "memory"
+#include "MainTable.h"
+
+class MainTable;
 
 class MainWindow : public QMainWindow, private Ui::MainWindow
 {
@@ -18,6 +21,8 @@ private slots:
 private:
     DatabaseManager *dbMan;
     std::unique_ptr<LTreeWidget> Ltree;
+
+    TableSystem::MainTable* m_mainTable;
 
     bool tableCreater();
     bool tableFiller(const QString& tableName);

@@ -17,6 +17,10 @@ MainWindow::MainWindow(DatabaseManager *dbInit, QMainWindow *parent)
     connect(Ltree.get(), &LTreeWidget::itemDoubleClicked, this, &MainWindow::onTreeItemDoubleClicked);
 
     tableFiller("example_table");
+
+
+	m_mainTable = new TableSystem::MainTable(tableView, toolBR, this);
+
 }
 
 MainWindow::~MainWindow()

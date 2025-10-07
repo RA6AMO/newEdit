@@ -15,10 +15,10 @@
 
 namespace TableSystem {
 
-MainTable::MainTable(QWidget* parent)
+MainTable::MainTable(QTableView* tableView, QWidget* toolbar, QWidget* parent)
     : QWidget(parent)
-    , m_tableView(nullptr)
-    , m_toolbar(nullptr)
+    , m_tableView(tableView)
+    , m_toolbar(toolbar)
     , m_addRowButton(nullptr)
     , m_removeRowButton(nullptr)
     , m_addColumnButton(nullptr)
@@ -178,6 +178,11 @@ void MainTable::enableEditing(bool enable)
     }
 }
 
+QWidget* MainTable::toolbar() const
+{
+    return m_toolbar;
+}
+
 // ========== Слоты ==========
 
 void MainTable::onCellClicked(const QModelIndex& index)
@@ -242,45 +247,31 @@ void MainTable::onAddColumnClicked()
 
 void MainTable::setupUI()
 {
-    QVBoxLayout* mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(0, 0, 0, 0);
-
-    // Toolbar (опциональный, можно скрыть)
-    m_toolbar = new QWidget(this);
-    QHBoxLayout* toolbarLayout = new QHBoxLayout(m_toolbar);
-    toolbarLayout->setContentsMargins(5, 5, 5, 5);
-
-    m_addRowButton = new QPushButton(tr("+ Строка"), m_toolbar);
-    m_removeRowButton = new QPushButton(tr("- Строка"), m_toolbar);
-    m_addColumnButton = new QPushButton(tr("+ Столбец"), m_toolbar);
-
-    toolbarLayout->addWidget(m_addRowButton);
-    toolbarLayout->addWidget(m_removeRowButton);
-    toolbarLayout->addWidget(m_addColumnButton);
-    toolbarLayout->addStretch();
-
-    mainLayout->addWidget(m_toolbar);
-
-    // TableView
-    m_tableView = new QTableView(this);
+    // Настройка переданного tableView
     m_tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_tableView->setSelectionMode(QAbstractItemView::SingleSelection);
     m_tableView->setAlternatingRowColors(true);
     m_tableView->horizontalHeader()->setStretchLastSection(true);
     m_tableView->verticalHeader()->setVisible(true);
 
-    mainLayout->addWidget(m_tableView);
-
-    // По умолчанию toolbar скрыт
-    m_toolbar->setVisible(false);
+    // Ищем кнопки в toolbar по objectName (установленным в Qt Designer)
+    m_addRowButton = m_toolbar->findChild<QPushButton*>("addRowButton");
+    m_removeRowButton = m_toolbar->findChild<QPushButton*>("removeRowButton");
+    m_addColumnButton = m_toolbar->findChild<QPushButton*>("addColumnButton");
 }
 
 void MainTable::setupConnections()
 {
-    // Кнопки toolbar
-    connect(m_addRowButton, &QPushButton::clicked, this, &MainTable::onAddRowClicked);
-    connect(m_removeRowButton, &QPushButton::clicked, this, &MainTable::onRemoveRowClicked);
-    connect(m_addColumnButton, &QPushButton::clicked, this, &MainTable::onAddColumnClicked);
+    // Кнопки toolbar - подключаем только если они найдены
+    if (m_addRowButton) {
+        connect(m_addRowButton, &QPushButton::clicked, this, &MainTable::onAddRowClicked);
+    }
+    if (m_removeRowButton) {
+        connect(m_removeRowButton, &QPushButton::clicked, this, &MainTable::onRemoveRowClicked);
+    }
+    if (m_addColumnButton) {
+        connect(m_addColumnButton, &QPushButton::clicked, this, &MainTable::onAddColumnClicked);
+    }
 
     // События таблицы
     connect(m_tableView, &QTableView::clicked, this, &MainTable::onCellClicked);

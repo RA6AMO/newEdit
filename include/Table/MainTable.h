@@ -20,7 +20,7 @@ class MainTable : public QWidget {
     Q_OBJECT
 
 public:
-    explicit MainTable(QWidget* parent = nullptr);
+    explicit MainTable(QTableView* tableView, QWidget* toolbar, QWidget* parent = nullptr);
     ~MainTable();
 
     // ========== Установка данных ==========
@@ -64,10 +64,11 @@ public:
     DataSyncManager* syncManager() const;
     QTableView* tableView() const;
 
-    // ========== UI элементы (опционально) ==========
+    // ========== UI элементы ==========
 
     void showToolbar(bool show);
     void enableEditing(bool enable);
+    QWidget* toolbar() const;
 
 signals:
     void dataChanged();
