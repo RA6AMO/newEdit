@@ -18,7 +18,7 @@ MainWindow::MainWindow(DatabaseManager *dbInit, QMainWindow *parent)
 
     tableFiller("example_table");
 
-
+//
 	m_mainTable = new TableSystem::MainTable(tableView, toolBR, this);
 
 }

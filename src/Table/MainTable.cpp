@@ -4,6 +4,7 @@
 #include "Table/Managers/ColumnManager.h"
 #include "Table/Managers/CellInteractionManager.h"
 #include "Table/Managers/DataSyncManager.h"
+#include "TableColumnCreater.h"
 #include <QTableView>
 #include <QPushButton>
 #include <QVBoxLayout>
@@ -26,6 +27,7 @@ MainTable::MainTable(QTableView* tableView, QWidget* toolbar, QWidget* parent)
     , m_columnManager(nullptr)
     , m_interactionManager(nullptr)
     , m_syncManager(nullptr)
+
 {
     setupUI();
     initializeManagers();
@@ -231,16 +233,17 @@ void MainTable::onRemoveRowClicked()
 
 void MainTable::onAddColumnClicked()
 {
-    // Простой диалог добавления столбца
-    QString columnName = QInputDialog::getText(
-        this,
-        tr("Новый столбец"),
-        tr("Введите имя столбца:")
-    );
+    TableColumnCreater dialog(this);
 
-    if (!columnName.isEmpty()) {
-        addColumn(columnName, ColumnType::Text);
+    // Открываем модальный диалог и ждем результата
+    if (dialog.exec() == QDialog::Accepted) {
+        QString columnName = dialog.getColumnName();
+        ColumnType columnType = dialog.getColumnType();
+
+
+        addColumn(columnName, columnType);
     }
+    // Если Rejected - ничего не делаем, пользователь отменил
 }
 
 // ========== Приватные методы ==========

@@ -1,5 +1,6 @@
 #include "Table/Managers/CellInteractionManager.h"
 #include "Table/TableModel.h"
+#include "TableColumn.h"
 #include <QTableView>
 #include <QStyledItemDelegate>
 #include <QDebug>
@@ -114,8 +115,51 @@ bool CellInteractionManager::handleCellClick(const QModelIndex& index)
 
 bool CellInteractionManager::handleCellDoubleClick(const QModelIndex& index)
 {
-    // Можно обрабатывать двойной клик отдельно
-    return handleCellClick(index);
+    if (!index.isValid())
+        return false;
+
+    TableColumn col = m_model->column(index.column());
+    switch (col.type()) {
+    case ColumnType::Text:       {
+        // двойной клик по тексту
+        return handleCellClick(index);
+    }
+    case ColumnType::Number:     {
+        // двойной клик по числу
+        return handleCellClick(index);
+    }
+    case ColumnType::Date:       {
+        // двойной клик по дате
+        return handleCellClick(index);
+    }
+    case ColumnType::Image:      {
+        // двойной клик по изображению
+        return handleCellClick(index);
+    }
+    case ColumnType::Boolean:    {
+        // двойной клик по чекбоксу
+        return handleCellClick(index);
+    }
+    case ColumnType::ComboBox:   {
+        // двойной клик по комбобоксу
+        return handleCellClick(index);
+    }
+    case ColumnType::Button:     {
+        // двойной клик по кнопке
+        return handleCellClick(index);
+    }
+    case ColumnType::FileDialog: {
+        // двойной клик для открытия диалога файла
+        return handleCellClick(index);
+    }
+    case ColumnType::Custom:     {
+        // пользовательский тип
+        return handleCellClick(index);
+    }
+    }
+
+    // Если появятся новые значения enum и вы забудете обработать:
+    return false;
 }
 
 bool CellInteractionManager::handleCellValueChanged(const QModelIndex& index, const QVariant& newValue)

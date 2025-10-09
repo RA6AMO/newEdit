@@ -54,6 +54,7 @@ public:
 
     // ========== Управление строками ==========
 
+
     bool insertRow(int row, const QModelIndex& parent = QModelIndex());
     bool removeRow(int row, const QModelIndex& parent = QModelIndex());
 
