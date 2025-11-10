@@ -8,13 +8,13 @@ struct TreeStruct
     QString parent_id;
     QString id;
 };
-LTreeWidget::LTreeWidget(QWidget *parent) : QTreeWidget(parent), dbMan(nullptr)
+LTreeWidget::LTreeWidget(QWidget *parent) : QTreeWidget(parent), dbInit(nullptr)
 {
     setupContextMenu();
     // Не инициализируем дерево, так как нет имени таблицы и менеджера БД
 }
 
-LTreeWidget::LTreeWidget(QString tableName,QWidget *parent, DatabaseManager *dbMan) : QTreeWidget(parent), dbMan(dbMan)
+LTreeWidget::LTreeWidget(QString tableName,QWidget *parent, DatabaseManager *dbInit) : QTreeWidget(parent), dbInit(dbInit)
 {
     m_tableName = tableName;
     setupContextMenu();
@@ -51,7 +51,7 @@ void LTreeWidget::setupContextMenu()
 
 void LTreeWidget::iniTree(QString tableName)
 {
-    QList<QSqlRecord> records = dbMan->getReader()->selectAll(tableName);
+    QList<QSqlRecord> records = dbInit->getReader()->selectAll(tableName);
     std::vector<TreeStruct> treeNodes;
     for(const auto &record : records) {
         TreeStruct tmp;
@@ -185,16 +185,27 @@ void LTreeWidget::onRenameNode()
 
 void LTreeWidget::addNodeToRoot()
 {
-    QString name = QInputDialog::getText(this, tr("Новый узел"), tr("Имя:"));
-    if (name.isEmpty()) return;
+    bool ok = false;
+    QString name = QInputDialog::getText(
+    this,
+    tr("Новый узел"),
+    tr("Имя:"),
+    QLineEdit::Normal,
+    QString(),
+    &ok
+    ).trimmed();
+
+    if (!ok || name.isEmpty()) {
+        return;
+    }
 
     QVariantMap values;
     values["name"] = name;
     values["parent_id"] = 0;
 
-    qint64 id = dbMan->getModifier()->insertRecordAndReturnId(m_tableName, values, "id");
+    qint64 id = dbInit->getModifier()->insertRecordAndReturnId(m_tableName, values, "id");
     if (id < 0) {
-        QMessageBox::warning(this, tr("Ошибка"), dbMan->getModifier()->getLastError());
+        QMessageBox::warning(this, tr("Ошибка"), dbInit->getModifier()->getLastError());
         return;
     }
 
@@ -216,9 +227,9 @@ void LTreeWidget::addNodeToParent(const QString &parentId)
     values["name"] = name;
     values["parent_id"] = parentId;
 
-    qint64 id = dbMan->getModifier()->insertRecordAndReturnId(m_tableName, values, "id");
+    qint64 id = dbInit->getModifier()->insertRecordAndReturnId(m_tableName, values, "id");
     if (id < 0) {
-        QMessageBox::warning(this, tr("Ошибка"), dbMan->getModifier()->getLastError());
+        QMessageBox::warning(this, tr("Ошибка"), dbInit->getModifier()->getLastError());
         return;
     }
 
@@ -243,17 +254,17 @@ void LTreeWidget::deleteNode(const QString &nodeId)
     QString parentId = itemMap[nodeId]->data(0, Qt::UserRole).toString();
 
     // В транзакции: перепривязываем детей к родителю удаляемого узла, затем удаляем узел
-    bool ok = dbMan->getModifier()->executeInTransaction([&]{
+    bool ok = dbInit->getModifier()->executeInTransaction([&]{
         // Перепривязываем всех детей к родителю удаляемого узла
 
-        int affected = dbMan->getModifier()->updateColumn(m_tableName, "parent_id", parentId,QString("parent_id = %1").arg(nodeId));
+        int affected = dbInit->getModifier()->updateColumn(m_tableName, "parent_id", parentId,QString("parent_id = %1").arg(nodeId));
         qDebug() << "affected" << affected;
         if (affected < 0) {
             return false;
         }
 
         // Удаляем сам узел
-        affected = dbMan->getModifier()->deleteRecordById(m_tableName, nodeId, "id");
+        affected = dbInit->getModifier()->deleteRecordById(m_tableName, nodeId, "id");
         if (affected < 0) {
             qDebug() << "affected" << affected;
             return false;
@@ -262,7 +273,7 @@ void LTreeWidget::deleteNode(const QString &nodeId)
     });
 
     if (!ok) {
-        QMessageBox::warning(this, tr("Ошибка"), dbMan->getModifier()->getLastError());
+        QMessageBox::warning(this, tr("Ошибка"), dbInit->getModifier()->getLastError());
         return;
     }
 
@@ -314,8 +325,8 @@ void LTreeWidget::renameNode(const QString &nodeId)
                                          QLineEdit::Normal, current, &ok);
     if (!ok || name.isEmpty() || name == current) return;
 
-    if (!dbMan->getModifier()->updateRecordById(m_tableName, nodeId, {{"name", name}}, "id")) {
-        QMessageBox::warning(this, tr("Ошибка"), dbMan->getModifier()->getLastError());
+    if (!dbInit->getModifier()->updateRecordById(m_tableName, nodeId, {{"name", name}}, "id")) {
+        QMessageBox::warning(this, tr("Ошибка"), dbInit->getModifier()->getLastError());
         return;
     }
 

@@ -18,10 +18,10 @@ class LTreeWidget : public QTreeWidget
     Q_OBJECT
 public:
     explicit LTreeWidget(QWidget *parent = nullptr);
-    LTreeWidget(QString tableName, QWidget *parent = nullptr, DatabaseManager *dbMan = nullptr);
+    LTreeWidget(QString tableName, QWidget *parent = nullptr, DatabaseManager *dbInit = nullptr);
     ~LTreeWidget();
 
-    void configure(const QString &tableName, DatabaseManager *dbMan);
+    void configure(const QString &tableName, DatabaseManager *dbInit);
 
     void addNodeToRoot();
     void addNodeToParent(const QString &parentId);
@@ -44,7 +44,7 @@ private:
     void iniTree(QString tableName);
     void setupContextMenu();
     QString m_tableName;
-    DatabaseManager *dbMan;
+    DatabaseManager *dbInit;
 
     //std::vector<TreeStruct> treeNodes;
     QMap<QString, std::shared_ptr<QTreeWidgetItem>> itemMap;

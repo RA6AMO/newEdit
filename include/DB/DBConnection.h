@@ -28,6 +28,11 @@ public:
     void createTable();
 private:
     int CountConnections;
+
+    // Вспомогательные методы для инициализации БД
+    bool getDefaultOpenDb(QSqlDatabase& outDb) const;
+    void createUsersTable(QSqlDatabase& db);
+    void createTreeNodesTable(QSqlDatabase& db);
     //QSqlDatabase db;
     //QList<QString> connectionNames;
 };

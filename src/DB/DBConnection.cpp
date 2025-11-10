@@ -89,23 +89,38 @@ void DBConnection::closeDB()
 
 void DBConnection::createTable()
 {
+    QSqlDatabase db;
+    if (!getDefaultOpenDb(db)) {
+        return;
+    }
+    createUsersTable(db);
+    createTreeNodesTable(db);
+}
+
+bool DBConnection::getDefaultOpenDb(QSqlDatabase& outDb) const
+{
     QList<QString> connectionList = QSqlDatabase::connectionNames();
 
     if (connectionList.isEmpty()) {
         qWarning() << "no active connections with database";
-        return;
+        return false;
     }
     if (connectionList.indexOf(DEFAULT_CONNECTION_NAME) == -1) {
         qWarning() << "no active connection with database by name:" << DEFAULT_CONNECTION_NAME;
-        return;
+        return false;
     }
     QSqlDatabase db = QSqlDatabase::database(connectionList.at(connectionList.indexOf(DEFAULT_CONNECTION_NAME)));
 
     if (!db.isOpen()) {
         qWarning() << "database not opened";
-        return;
+        return false;
     }
+    outDb = db;
+    return true;
+}
 
+void DBConnection::createUsersTable(QSqlDatabase& db)
+{
     QSqlQuery query(db);
 
     // Подготавливаем SQL-запрос для проверки существования таблицы 'users' в системной таблице sqlite_master
@@ -135,5 +150,35 @@ void DBConnection::createTable()
         }
     } else {
         qDebug() << "table users already exists";
+    }
+}
+
+void DBConnection::createTreeNodesTable(QSqlDatabase& db)
+{
+    QSqlQuery query(db);
+
+    // Проверяем существование таблицы 'tree_nodes'
+    query.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='tree_nodes'");
+
+    if (!query.exec()) {
+        qWarning() << "error checking existence of table tree_nodes:" << query.lastError().text();
+        return;
+    }
+
+    if (!query.next()) {
+        const QString createTreeQuery =
+            "CREATE TABLE tree_nodes ("
+            "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+            "name TEXT NOT NULL,"
+            "parent_id INTEGER DEFAULT 0"
+            ")";
+
+        if (!query.exec(createTreeQuery)) {
+            qWarning() << "error creating table tree_nodes:" << query.lastError().text();
+        } else {
+            qDebug() << "table tree_nodes successfully created";
+        }
+    } else {
+        qDebug() << "table tree_nodes already exists";
     }
 }

@@ -3,6 +3,9 @@
 #include "DBManager.h"
 #include "LTreeWidget.h"
 #include "memory"
+#include <QDateTime>
+#include <QVariantMap>
+#include "DataModifier.h"
 
 class MainWindow : public QMainWindow, private Ui::MainWindow
 {

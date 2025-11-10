@@ -37,13 +37,11 @@ bool DataModifier::insertRecord(const QString& tableName, const QVariantMap& val
     }
 
     QStringList columns;
-    QStringList placeholders;
-    QVariantList bindValues;
+    QStringList placeholders; // именованные плейсхолдеры вида :column
 
     for (auto it = values.constBegin(); it != values.constEnd(); ++it) {
         columns << it.key();
-        placeholders << "?";
-        bindValues << it.value();
+        placeholders << (":" + it.key());
     }
 
     QString queryStr = QString("INSERT INTO %1 (%2) VALUES (%3)")
@@ -52,10 +50,13 @@ bool DataModifier::insertRecord(const QString& tableName, const QVariantMap& val
                            .arg(placeholders.join(", "));
 
     QSqlQuery query(getDatabase());
-    query.prepare(queryStr);
+    if (!query.prepare(queryStr)) {
+        setError(query.lastError());
+        return false;
+    }
 
-    for (const QVariant& value : bindValues) {
-        query.addBindValue(value);
+    for (auto it = values.constBegin(); it != values.constEnd(); ++it) {
+        query.bindValue(":" + it.key(), it.value());
     }
 
     return executeAndUpdateStats(query);
