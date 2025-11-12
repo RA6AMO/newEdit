@@ -6,6 +6,7 @@
 #include <QDateTime>
 #include <QVariantMap>
 #include "DataModifier.h"
+#include "TableInteract.h"
 
 class MainWindow : public QMainWindow, private Ui::MainWindow
 {
@@ -21,6 +22,7 @@ private slots:
 private:
     DatabaseManager *dbMan;
     std::unique_ptr<LTreeWidget> Ltree;
+    std::unique_ptr<TableInteract> tableInteract;
 
     bool tableCreater();
     bool tableFiller(const QString& tableName);
