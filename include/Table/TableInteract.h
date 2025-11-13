@@ -16,11 +16,17 @@ class TableInteract : public QObject
     Q_OBJECT
 public:
 
-    TableInteract(QObject *parent = nullptr);
+    TableInteract(MainTable *tableView,QObject *parent = nullptr);
     ~TableInteract();
+
+
+    void ForTestCommand();
 
 private:
     TableDataModel *tableModel;
     MainTable *tableView;
+
+
+
 
 };

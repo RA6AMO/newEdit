@@ -27,6 +27,7 @@ file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS
   "${CMAKE_SOURCE_DIR}/src/*.cpp"
   "${CMAKE_SOURCE_DIR}/src/TreeWidgets/*.cpp"
   "${CMAKE_SOURCE_DIR}/src/DB/*.cpp"
+  "${CMAKE_SOURCE_DIR}/src/Table/*.cpp"
 )
 
 # Добавляем заголовочные файлы для правильной работы MOC с Q_OBJECT
@@ -34,6 +35,7 @@ file(GLOB_RECURSE PROJECT_HEADERS CONFIGURE_DEPENDS
   "${CMAKE_SOURCE_DIR}/include/*.h"
   "${CMAKE_SOURCE_DIR}/include/TreeWidgets/*.h"
   "${CMAKE_SOURCE_DIR}/include/DB/*.h"
+  "${CMAKE_SOURCE_DIR}/include/Table/*.h"
 )
 
 add_executable(app ${PROJECT_SOURCES} ${PROJECT_HEADERS})
@@ -43,7 +45,9 @@ target_include_directories(app PRIVATE
     "${CMAKE_SOURCE_DIR}/include"
     "${CMAKE_SOURCE_DIR}/include/TreeWidgets"
     "${CMAKE_SOURCE_DIR}/include/DB"
+    "${CMAKE_SOURCE_DIR}/include/Table"
     ${THIRD_PARTY_INCLUDE_DIR}
+
 )
 
 # Qt6 модули (Widgets достаточно для классических оконных приложений)

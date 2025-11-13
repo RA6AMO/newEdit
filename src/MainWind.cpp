@@ -10,7 +10,7 @@ MainWindow::MainWindow(DatabaseManager *dbInit, QMainWindow *parent)
 
     Ltree = std::make_unique<LTreeWidget>("tree_nodes",treeWidget, dbMan);
 
-    tableInteract = std::make_unique<TableInteract>(tableView);
+    tableInteract = std::make_unique<TableInteract>(tableView, this);
 
 }
 
