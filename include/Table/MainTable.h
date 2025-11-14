@@ -1,14 +1,14 @@
 #pragma once
-#include <QTableWidget>
+#include <QTableView>
 #include <QMainWindow>
 #include <QMenu>
 #include <QAction>
 #include <QInputDialog>
-#include "DBManager.h"
 #include <vector>
 #include <algorithm>
 #include <QMap>
 #include <memory>
+#include "HeaderTable.h"
 
 
 class MainTable : public QTableView
@@ -17,4 +17,9 @@ class MainTable : public QTableView
 public:
     MainTable(QWidget *parent = nullptr);
     ~MainTable();
+
+    CustomHeaderView* getCustomHeader() const { return m_customHeader; }
+
+private:
+    CustomHeaderView *m_customHeader;
 };

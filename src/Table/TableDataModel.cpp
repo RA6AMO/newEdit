@@ -4,6 +4,14 @@ TableDataModel::TableDataModel(QObject *parent)
     : QAbstractTableModel(parent)
 {
     m_columnHeaders.clear();
+    m_columnCount = 0;
+    m_rowCount = 0;
+    //загрузка данных из db
+    //if(Дата есть в db)
+    //    загружаем данные из db
+    //else
+    //    создаем новый столбец
+    onHeaderAddRequested(0, false);
 }
 
 TableDataModel::~TableDataModel()
@@ -37,7 +45,16 @@ bool TableDataModel::insertColumns(int column, int count, const QModelIndex &par
     Q_UNUSED(parent);
     if (column < 0 || column > m_columnCount || count <= 0) return false;
 
+    bool hadPlaceholder = (m_columnCount == 1 && m_columnHeaders.size() > 0 && m_columnHeaders[0] == "Столбец");
+    if (hadPlaceholder) {
+        onHeaderRenameRequested(0,"Столбец 1");
+        return false;
+    }
+
     beginInsertColumns(QModelIndex(), column, column + count - 1);
+
+    // Убираем плейсхолдер, если он существует (m_columnCount == 1 и заголовок "Столбец")
+
 
     // Добавляем столбцы во все строки
     for (int i = 0; i < m_rowCount; ++i) {
@@ -189,12 +206,22 @@ bool TableDataModel::setHeaderData(int section, Qt::Orientation orientation, con
         if (section < 0 || section >= m_columnCount)
             return false;
 
+        QString newName = value.toString();
+
+        // Проверка на уникальность имени
+        // Проверяем все заголовки, кроме текущего столбца
+        for (int i = 0; i < m_columnHeaders.size(); ++i) {
+            if (i != section && m_columnHeaders[i] == newName && !newName.isEmpty()) {
+                return false; // Имя уже используется в другом столбце
+            }
+        }
+
         // Расширяем вектор заголовков при необходимости
         while (m_columnHeaders.size() <= section) {
             m_columnHeaders.append(QString());
         }
 
-        m_columnHeaders[section] = value.toString();
+        m_columnHeaders[section] = newName;
 
         // Уведомляем представление об изменении заголовка
         emit headerDataChanged(orientation, section, section);
@@ -203,4 +230,52 @@ bool TableDataModel::setHeaderData(int section, Qt::Orientation orientation, con
     }
 
     return false;
+}
+
+bool TableDataModel::onHeaderAddRequested(int logicalIndex, bool addToRight)
+{
+    if (logicalIndex < 0 || logicalIndex > m_columnCount) {
+        return false;
+    }
+
+    // Определяем позицию вставки
+    int insertPosition = addToRight ? logicalIndex + 1 : logicalIndex;
+
+    // Вставляем один столбец
+    insertColumns(insertPosition, 1);
+
+    QString defaultName;
+    if(m_columnCount == 1 && m_columnHeaders[0] == QString())
+        defaultName = "Столбец";
+    else
+        defaultName = QString("Столбец %1").arg(insertPosition + 1);
+    setHeaderData(insertPosition, Qt::Horizontal, defaultName);
+    return true;
+}
+
+bool TableDataModel::onHeaderDeleteRequested(int logicalIndex)
+{
+    if (logicalIndex < 0 || logicalIndex >= m_columnCount) {
+        return false;
+    }
+
+    // Удаляем один столбец
+    removeColumns(logicalIndex, 1);
+
+    // Если после удаления не осталось столбцов, создаем плейсхолдер
+    if (m_columnCount == 0) {
+        onHeaderAddRequested(0, false);
+    }
+    return true;
+}
+
+bool TableDataModel::onHeaderRenameRequested(int logicalIndex, const QString &newName)
+{
+    if (logicalIndex < 0 || logicalIndex >= m_columnCount) {
+        return false;
+    }
+
+    // Устанавливаем новое имя заголовка
+    setHeaderData(logicalIndex, Qt::Horizontal, newName);
+    return true;
 }

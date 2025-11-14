@@ -27,15 +27,22 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
     bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role = Qt::EditRole);
 
-    bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex());
-    bool insertColumns(int column, int count, const QModelIndex &parent = QModelIndex());
-    bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
-    bool removeColumns(int column, int count, const QModelIndex &parent = QModelIndex());
 
+
+public slots:
+    // Слоты для обработки сигналов из CustomHeaderView
+    bool onHeaderAddRequested(int logicalIndex, bool addToRight);
+    bool onHeaderDeleteRequested(int logicalIndex);
+    bool onHeaderRenameRequested(int logicalIndex, const QString &newName);
+
+    bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
+    bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex());
 
 private:
 
 
+    bool insertColumns(int column, int count, const QModelIndex &parent = QModelIndex());
+    bool removeColumns(int column, int count, const QModelIndex &parent = QModelIndex());
 
 
     QVector<QVector<QVariant>> m_data;
