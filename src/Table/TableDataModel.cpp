@@ -45,25 +45,25 @@ bool TableDataModel::insertColumns(int column, int count, const QModelIndex &par
     Q_UNUSED(parent);
     if (column < 0 || column > m_columnCount || count <= 0) return false;
 
-    bool hadPlaceholder = (m_columnCount == 1 && m_columnHeaders.size() > 0 && m_columnHeaders[0] == "Столбец");
-    if (hadPlaceholder) {
-        onHeaderRenameRequested(0,"Столбец 1");
-        return false;
+    if(m_columnHeaders.size() > 0){
+        bool hadPlaceholder = (m_columnCount == 1 && m_columnHeaders[0] == "Столбец");
+        if (hadPlaceholder) {
+            onHeaderRenameRequested(0,"имя ячейки");
+            return true;
+        }
     }
 
     beginInsertColumns(QModelIndex(), column, column + count - 1);
 
     // Убираем плейсхолдер, если он существует (m_columnCount == 1 и заголовок "Столбец")
-
-
     // Добавляем столбцы во все строки
     for (int i = 0; i < m_rowCount; ++i) {
         for (int j = 0; j < count; ++j) {
             m_data[i].insert(column + j, QVariant());
         }
     }
-
     // Вставляем пустые заголовки для новых столбцов
+
     for (int j = 0; j < count; ++j) {
         m_columnHeaders.insert(column + j, QString());
     }
@@ -242,15 +242,34 @@ bool TableDataModel::onHeaderAddRequested(int logicalIndex, bool addToRight)
     int insertPosition = addToRight ? logicalIndex + 1 : logicalIndex;
 
     // Вставляем один столбец
-    insertColumns(insertPosition, 1);
+    if (!insertColumns(insertPosition, 1)) {
+        return false; // Проверяем успешность вставки
+    }
 
-    QString defaultName;
-    if(m_columnCount == 1 && m_columnHeaders[0] == QString())
-        defaultName = "Столбец";
-    else
-        defaultName = QString("Столбец %1").arg(insertPosition + 1);
-    setHeaderData(insertPosition, Qt::Horizontal, defaultName);
-    return true;
+    // Определяем базовое имя для нового заголовка
+    QString baseName;
+    if (m_columnHeaders.size() > 0 && m_columnCount == 1 && m_columnHeaders[0] == QString()) {
+        baseName = "Столбец";
+    } else {
+        baseName = QString("Новое имя %1").arg(insertPosition);
+    }
+
+    if (baseName.isEmpty()) {
+        baseName = QString("Столбец %1").arg(insertPosition + 1);
+    }
+
+    // Устанавливаем уникальное имя заголовка
+    const int maxAttempts = 1000;
+    for (int suffix = 0; suffix < maxAttempts; ++suffix) {
+        QString candidate = (suffix == 0)
+                                ? baseName
+                                : QString("%1 (%2)").arg(baseName).arg(suffix);
+        if (setHeaderData(insertPosition, Qt::Horizontal, candidate)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 bool TableDataModel::onHeaderDeleteRequested(int logicalIndex)
@@ -278,4 +297,34 @@ bool TableDataModel::onHeaderRenameRequested(int logicalIndex, const QString &ne
     // Устанавливаем новое имя заголовка
     setHeaderData(logicalIndex, Qt::Horizontal, newName);
     return true;
+}
+
+bool TableDataModel::onRowAddRequested(int logicalIndex)
+{
+    int insertPosition = logicalIndex + 1;
+
+    if (insertPosition < 0) {
+        insertPosition = 0;
+    }
+
+    if (insertPosition > m_rowCount) {
+        insertPosition = m_rowCount;
+    }
+
+    return insertRows(insertPosition, 1, QModelIndex());
+}
+
+bool TableDataModel::onRowDeleteRequested(int logicalIndex)
+{
+    if (logicalIndex < 0 || logicalIndex >= m_rowCount) {
+        return false;
+    }
+
+    bool removed = removeRows(logicalIndex, 1, QModelIndex());
+
+    if (removed && m_rowCount == 0) {
+        insertRows(0, 1, QModelIndex());
+    }
+
+    return removed;
 }

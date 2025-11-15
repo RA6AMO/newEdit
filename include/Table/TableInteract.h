@@ -1,4 +1,6 @@
 #pragma once
+#include <QDebug>
+#include <QtGlobal>
 #include <QObject>
 #include <QVariant>
 #include <QList>
@@ -8,6 +10,7 @@
 #include <QHash>
 #include <QSet>
 #include <QStack>
+#include <QModelIndex>
 #include "TableDataModel.h"
 #include "MainTable.h"
 
@@ -21,6 +24,9 @@ public:
 
 
     void ForTestCommand();
+
+private slots:
+    void determineCellType(const QModelIndex &index);
 
 private:
     TableDataModel *tableModel;

@@ -34,6 +34,8 @@ public slots:
     bool onHeaderAddRequested(int logicalIndex, bool addToRight);
     bool onHeaderDeleteRequested(int logicalIndex);
     bool onHeaderRenameRequested(int logicalIndex, const QString &newName);
+    bool onRowAddRequested(int logicalIndex);
+    bool onRowDeleteRequested(int logicalIndex);
 
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
     bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex());

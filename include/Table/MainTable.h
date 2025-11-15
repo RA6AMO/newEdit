@@ -2,6 +2,7 @@
 #include <QTableView>
 #include <QMainWindow>
 #include <QMenu>
+#include <QContextMenuEvent>
 #include <QAction>
 #include <QInputDialog>
 #include <vector>
@@ -19,7 +20,15 @@ public:
     ~MainTable();
 
     CustomHeaderView* getCustomHeader() const { return m_customHeader; }
+    RowHeaderView* getRowHeader() const { return m_rowHeader; }
+
+signals:
+    void editCellRequested(QModelIndex index);
+
+protected:
+    void contextMenuEvent(QContextMenuEvent *event) override;
 
 private:
     CustomHeaderView *m_customHeader;
+    RowHeaderView *m_rowHeader;
 };

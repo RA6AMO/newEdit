@@ -36,3 +36,30 @@ private:
     QAction *m_deleteAction;
     QAction *m_renameAction;
 };
+
+class RowHeaderView : public QHeaderView
+{
+    Q_OBJECT
+public:
+    RowHeaderView(Qt::Orientation orientation, QWidget *parent = nullptr);
+    ~RowHeaderView();
+
+protected:
+    void mousePressEvent(QMouseEvent *event) override;
+    void contextMenuEvent(QContextMenuEvent *event) override;
+
+signals:
+    void rowAddRequested(int logicalIndex);                  // запрос на добавление строки по индексу
+    void rowDeleteRequested(int logicalIndex);              // индекс строки
+    void rowHeaderClicked(int logicalIndex);                // клик по заголовку строки
+
+private slots:
+    void onAdd();
+    void onDelete();
+
+private:
+    int m_contextMenuIndex;  // индекс строки, по которой вызвали меню
+    QMenu *m_contextMenu;
+    QAction *m_addAction;
+    QAction *m_deleteAction;
+};

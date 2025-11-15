@@ -6,7 +6,7 @@ CustomHeaderView::CustomHeaderView(Qt::Orientation orientation, QWidget *parent)
     : QHeaderView(orientation, parent), m_contextMenuIndex(-1), m_addToRight(false)
 {
     // Можно настроить поведение заголовка
-    setSectionsClickable(true);  // Разрешить клики
+    setSectionsClickable(false);  // Разрешить клики
     setSectionsMovable(false);    // Запретить перемещение столбцов
     setStretchLastSection(true);  // Растянуть последний столбец
 
@@ -109,5 +109,66 @@ void CustomHeaderView::onRename()
         if (ok && !newName.isEmpty()) {
             emit headerRenameRequested(m_contextMenuIndex, newName);
         }
+    }
+}
+
+// RowHeaderView (вертикальный заголовок строк)
+RowHeaderView::RowHeaderView(Qt::Orientation orientation, QWidget *parent)
+    : QHeaderView(orientation, parent), m_contextMenuIndex(-1)
+{
+    setSectionsClickable(true);
+    setSectionsMovable(false);
+    setStretchLastSection(true);
+
+    m_contextMenu = new QMenu(this);
+    m_addAction = m_contextMenu->addAction("Добавить");
+    m_deleteAction = m_contextMenu->addAction("Удалить");
+
+    connect(m_addAction, &QAction::triggered, this, &RowHeaderView::onAdd);
+    connect(m_deleteAction, &QAction::triggered, this, &RowHeaderView::onDelete);
+}
+
+RowHeaderView::~RowHeaderView()
+{
+}
+
+void RowHeaderView::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton) {
+        int logicalIndex = logicalIndexAt(event->pos());
+        if (logicalIndex >= 0) {
+            qDebug() << "Клик по заголовку строки:" << logicalIndex;
+            emit rowHeaderClicked(logicalIndex);
+            QAbstractItemModel *model = this->model();
+            if (model) {
+                QVariant headerText = model->headerData(logicalIndex, orientation(), Qt::DisplayRole);
+                qDebug() << "Текст заголовка строки:" << headerText.toString();
+            }
+        }
+    }
+    QHeaderView::mousePressEvent(event);
+}
+
+void RowHeaderView::contextMenuEvent(QContextMenuEvent *event)
+{
+    int logicalIndex = logicalIndexAt(event->pos());
+    if (logicalIndex >= 0) {
+        m_contextMenuIndex = logicalIndex;
+
+        m_contextMenu->exec(event->globalPos());
+    }
+}
+
+void RowHeaderView::onAdd()
+{
+    if (m_contextMenuIndex >= 0) {
+        emit rowAddRequested(m_contextMenuIndex);
+    }
+}
+
+void RowHeaderView::onDelete()
+{
+    if (m_contextMenuIndex >= 0) {
+        emit rowDeleteRequested(m_contextMenuIndex);
     }
 }
